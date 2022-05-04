@@ -1,8 +1,8 @@
 import React, {useEffect} from 'react';
-import {useStateContext} from "../context/StateContext";
-import {BsBagCheckFill} from "react-icons/bs";
-import Link from 'next/link'
-import {schoolPrideConfetti} from "../lib/utils";
+import {useStateContext} from '../context/StateContext';
+import {BsBagCheckFill} from 'react-icons/bs';
+import Link from 'next/link';
+import {schoolPrideConfetti} from '../lib/utils';
 
 const Success = () => {
 
