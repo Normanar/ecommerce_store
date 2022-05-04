@@ -6,9 +6,11 @@ const Context = createContext()
 export const StateContext = ({children}) => {
     const [showCart, setShowCart] = useState(false)
     const [cartItems, setCartItems] = useState([])
-    const [totalPrice, setTotalPrice] = useState()
-    const [totalQuantities, setTotalQuantities] = useState()
+    const [totalPrice, setTotalPrice] = useState(0)
+    const [totalQuantities, setTotalQuantities] = useState(0)
     const [quantity, setQuantity] = useState(1)
+
+    let foundProduct;
 
     const onAddToCart = (product, quantity) => {
         const checkProductInCart = cartItems.find(item => item._id === product._id)
@@ -30,9 +32,32 @@ export const StateContext = ({children}) => {
             product.quantity = quantity
             setCartItems([...cartItems, product])
         }
-
         toast.success(`${quantity} ${product.name} added to the cart.`, {duration : 2000})
     }
+
+    const onRemove = (id) => {
+        const removingProduct = cartItems.find(product => product._id === id)
+        setCartItems(cartItems.filter(product => product._id !== id))
+        setTotalQuantities(prevTotalQuantities => prevTotalQuantities - removingProduct.quantity)
+        setTotalPrice(prevTotalPrice => prevTotalPrice - removingProduct.quantity * removingProduct.price)
+    }
+
+    const toggleCartItemsQuantity = (id, value) => {
+        foundProduct = cartItems.find(product => product._id === id)
+
+        if (value === 'inc') {
+            setCartItems(cartItems.map(product => product._id === id ? {...product, quantity : product.quantity + 1} : product))
+            setTotalPrice(prevTotalPrice => prevTotalPrice + foundProduct.price)
+            setTotalQuantities(prevTotalQuantities => prevTotalQuantities + 1)
+        } else if (value === 'dec') {
+            if (foundProduct.quantity > 1) {
+                setCartItems(cartItems.map(product => product._id === id ? {...product, quantity : product.quantity - 1} : product))
+                setTotalPrice(prevTotalPrice => prevTotalPrice - foundProduct.price)
+                setTotalQuantities(prevTotalQuantities => prevTotalQuantities - 1)
+            }
+        }
+    }
+
     const incQuantity = () => setQuantity(prev => prev + 1)
     const decQuantity = () => setQuantity(prev => {
         if (prev - 1 < 1) return 1
@@ -51,6 +76,9 @@ export const StateContext = ({children}) => {
                 incQuantity,
                 decQuantity,
                 onAddToCart,
+                setShowCart,
+                toggleCartItemsQuantity,
+                onRemove,
             }}
         >
             {children}
